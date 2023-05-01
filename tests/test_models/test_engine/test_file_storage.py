@@ -67,6 +67,43 @@ test_file_storage.py'])
             self.assertTrue(len(func[1].__doc__) >= 1,
                             "{:s} method needs a docstring".format(func[0]))
 
+    def setUp(self):
+        """Sets up testing environment."""
+        self.storage = storage
+        self.state = State(name="California")
+        self.state.save()
+
+    def tearDown(self):
+        """Tears down testing environment."""
+        self.storage.delete_all()
+        del self.state
+
+    def test_get(self):
+        """Test that the get method retrieves an object by class and id"""
+        state_id = self.state.id
+        state = self.storage.get(State, state_id)
+        self.assertEqual(state.id, state_id)
+
+        wrong_state = self.storage.get(State, 'wrong_id')
+        self.assertIsNone(wrong_state)
+
+    def test_count_all(self):
+        """Test that the count method returns the count of all objects"""
+        count_all = self.storage.count()
+        self.assertEqual(count_all, 1)
+
+    def test_count_class(self):
+        """Test that the count method returns the count of objects of a class"""
+        count_state = self.storage.count(State)
+        self.assertEqual(count_state, 1)
+
+        count_base = self.storage.count(BaseModel)
+        self.assertEqual(count_base, 0)
+
+
+    if __name__ == '__main__':
+        unittest.main()
+
 
 class TestFileStorage(unittest.TestCase):
     """Test the FileStorage class"""
